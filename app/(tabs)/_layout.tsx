@@ -1,12 +1,9 @@
-import { Tabs } from 'expo-router';
+import {Tabs} from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import {Colors} from '@/constants/Colors';
+import {useColorScheme} from '@/hooks/useColorScheme';
+import {TabBarIcon} from "@/components/ui/TabBarIcon";
+import {FontAwesome5} from "@expo/vector-icons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -14,30 +11,64 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        // tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: "#6193a5",
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          position: "absolute",
+          bottom: 20,
+          marginLeft: 20,
+          marginRight: 20,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          elevation: 0,
+          paddingBottom: 0,
+          paddingTop: 0,
+          backgroundColor: Colors[colorScheme ?? "light"].background,
+          borderRadius: 15,
+          height: 60,
+          shadowColor: Colors[colorScheme ?? "light"].shadow,
+          shadowOpacity: 0.1,
+          shadowOffset: {
+            width: 0,
+            height: 0,
           },
-          default: {},
-        }),
-      }}>
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="support"
+        options={{
+          title: "ادعمني",
+          tabBarIcon: ({color}) => (
+            <FontAwesome5 name="coffee" size={24} color={color}/>
+          ),
+        }}
+      />
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "العب",
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon
+              name={focused ? "keypad" : "keypad-outline"}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "اعرفني",
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon
+              name={focused ? "people-circle" : "people-circle-outline"}
+              color={color}
+            />
+          ),
         }}
       />
     </Tabs>

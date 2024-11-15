@@ -1,74 +1,90 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
+import React, {useRef, useState} from "react";
+import Verse from "@/components/Verse";
+import Video from 'react-native-video';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+type VideoPlayer = any;
 
 export default function HomeScreen() {
+
+  const videoPlayer = useRef<VideoPlayer>(null);
+  const [surah] = useState<number>(1);
+  const [verseNumber] = useState<number>(1);
+
+  const [videoSource, setVideoSource] = useState(
+    require('../../assets/videos/male/normal.mov'),
+  );
+
+  const changeVideoSource = () => {
+    const source = `../../assets/videos/male/speaking.mov`;
+    setVideoSource(require(source));
+  };
+
+  const [content] = useState('');
+
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={styles.container}>
+      <View style={styles.bot}>
+        <Video
+          ref={videoPlayer}
+          source={videoSource}
+          style={styles.backgroundVideo}
+          muted={true}
+          repeat={true}
+          resizeMode="contain" // Or 'cover'
+          rate={1.0} // 0 is paused, 1 is normal.
+          ignoreSilentSwitch="obey"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <View style={styles.verse}>
+          <Verse surah={surah} verseNumber={verseNumber}/>
+        </View>
+      </View>
+      <View style={styles.content}>
+        <Text>{content || '...'}</Text>
+      </View>
+    </View>
   );
 }
 
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  bot: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  backgroundVideo: {
     position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
+  verse: {
+    position: 'absolute',
+    bottom: 35,
+    fontSize: 28,
+    textAlign: 'center',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    width: '100%',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    shadowColor: '#171717',
+    shadowOffset: {width: 0, height: -45},
+    shadowOpacity: 0.3,
+    shadowRadius: 45,
+    fontSize: 18,
   },
 });

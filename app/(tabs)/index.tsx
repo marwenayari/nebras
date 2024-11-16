@@ -1,40 +1,37 @@
+import React, {useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import React, {useRef, useState} from "react";
-import Verse from "@/components/Verse";
-import Video from 'react-native-video';
-
-type VideoPlayer = any;
+import {useVideoPlayer, VideoView} from 'expo-video';
+import Verse from '@/components/Verse';
 
 export default function HomeScreen() {
-
-  const videoPlayer = useRef<VideoPlayer>(null);
   const [surah] = useState<number>(1);
   const [verseNumber] = useState<number>(1);
 
   const [videoSource, setVideoSource] = useState(
-    require('../../assets/videos/male/normal.mov'),
+    require('../../assets/videos/male/normal.mov') // Static resource
   );
 
+  const player = useVideoPlayer(videoSource, (player) => {
+    player.muted = true;
+    player.loop = true;
+    player.play();
+  });
+
   const changeVideoSource = () => {
-    const source = `../../assets/videos/male/speaking.mov`;
-    setVideoSource(require(source));
+    const newSource = require('../../assets/videos/male/speaking.mov');
+    setVideoSource(newSource);
+    player.play()
   };
 
   const [content] = useState('');
 
-
   return (
     <View style={styles.container}>
       <View style={styles.bot}>
-        <Video
-          ref={videoPlayer}
-          source={videoSource}
+        <VideoView
+          player={player}
           style={styles.backgroundVideo}
-          muted={true}
-          repeat={true}
-          resizeMode="contain" // Or 'cover'
-          rate={1.0} // 0 is paused, 1 is normal.
-          ignoreSilentSwitch="obey"
+          contentFit="contain"
         />
         <View style={styles.verse}>
           <Verse surah={surah} verseNumber={verseNumber}/>
@@ -46,7 +43,6 @@ export default function HomeScreen() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

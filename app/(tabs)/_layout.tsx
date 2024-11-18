@@ -11,10 +11,10 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        // tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        tabBarActiveTintColor: "#6193a5",
+        tabBarActiveTintColor: "#0f898cab",
+        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].gray,
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true, // Enable label display
         tabBarStyle: {
           position: "absolute",
           bottom: 20,
@@ -23,46 +23,50 @@ export default function TabLayout() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          elevation: 0,
-          paddingBottom: 0,
-          paddingTop: 0,
+          elevation: 5, // Add elevation for better visibility
+          paddingBottom: 5, // Add padding for better spacing
+          paddingTop: 5,
           backgroundColor: Colors[colorScheme ?? "light"].background,
           borderRadius: 15,
-          height: 60,
+          height: 70, // Adjust height to accommodate labels
           shadowColor: Colors[colorScheme ?? "light"].shadow,
           shadowOpacity: 0.1,
           shadowOffset: {
             width: 0,
-            height: 0,
+            height: 5,
           },
+        },
+        tabBarLabelStyle: {
+          fontSize: 12, // Adjust font size for better appearance
+          marginTop: 2,
         },
       }}
     >
       <Tabs.Screen
         name="support"
         options={{
-          title: "ادعمني",
+          title: "ادعمنا",
+          tabBarLabel: "ادعمنا", // Add a label for the tab
           tabBarIcon: ({color}) => (
-            <FontAwesome5 name="coffee" size={24} color={color}/>
+            <FontAwesome5 name="hand-holding-heart" size={24} color={color}/>
           ),
         }}
       />
       <Tabs.Screen
         name="index"
         options={{
-          title: "العب",
+          title: "تدرب",
+          tabBarLabel: "تدرب", // Add a label for the tab
           tabBarIcon: ({color, focused}) => (
-            <TabBarIcon
-              name={focused ? "keypad" : "keypad-outline"}
-              color={color}
-            />
+            <FontAwesome5 name="book-reader" size={24} color={color}/>
           ),
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: "اعرفني",
+          title: "اعرفنا",
+          tabBarLabel: "اعرفنا", // Add a label for the tab
           tabBarIcon: ({color, focused}) => (
             <TabBarIcon
               name={focused ? "people-circle" : "people-circle-outline"}

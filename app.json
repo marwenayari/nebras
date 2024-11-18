@@ -33,7 +33,14 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-video"
+      "expo-video",
+      [
+        "@react-native-voice/voice",
+        {
+          "microphonePermission": "Allow Nebras to access the microphone",
+          "speechRecognitionPermission": "Allow Nebras to securely recognize user speech"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

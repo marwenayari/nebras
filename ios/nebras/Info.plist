@@ -81,5 +81,9 @@
     <string>Automatic</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app uses the microphone to recognize your speech.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>This app uses speech recognition to process your speech and respond accordingly.</string>
   </dict>
 </plist>

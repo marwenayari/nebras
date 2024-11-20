@@ -1,25 +1,14 @@
 import {SurahsMapping} from './surahsMapping';
 
-export function parseQuranReference(
-  speechText: string,
-): { surah: number; verse: number } | null {
-  // Regular expression to find arabic words and numbers in the speech text
-  const words = speechText.match(/[\u0600-\u06FF]+|\d+/g);
+export function parseSurahName(speechText: string): number | null {
+  const words = speechText.match(/[\u0600-\u06FF]+/g);
 
   if (!words) return null;
 
-  let surah = 0;
-  let verse = 0;
-
-  words.forEach(word => {
+  for (const word of words) {
     if (SurahsMapping[word]) {
-      surah = SurahsMapping[word];
+      return SurahsMapping[word];
     }
-    verse = 1;
-  });
-
-  if (surah && verse) {
-    return {surah, verse};
   }
 
   return null;

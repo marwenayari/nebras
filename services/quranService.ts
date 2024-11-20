@@ -1,5 +1,4 @@
-// src/services/quranService.ts
-import {Ayah, Surah} from '../types/quranTypes';
+import {Ayah, Surah} from "@/types/quranTypes";
 
 const BASE_URL = 'https://api.quran.com/api/v4'; // Replace with the actual base URL of the Quran.com API
 

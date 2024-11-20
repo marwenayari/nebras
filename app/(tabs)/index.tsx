@@ -5,10 +5,11 @@ import Verse from '@/components/Verse';
 import * as Speech from 'expo-speech';
 import Voice from '@react-native-voice/voice';
 import {getThemeColors} from "@/constants/themeConstants";
+import {parseQuranReference} from "@/utils/quranUtils";
 
 export default function HomeScreen() {
-  const [surah] = useState<number>(1);
-  const [verseNumber] = useState<number>(2);
+  const [surah, setSurah] = useState<number>(2);
+  const [verseNumber, setVerseNumber] = useState<number>(1);
   const [hasReplied, setHasReplied] = useState(false);
   const gender = 'male';
   const colors = getThemeColors(false, gender);
@@ -54,6 +55,10 @@ export default function HomeScreen() {
     setIsListening(false);
   };
 
+  const replyGreeting = () => {
+    Speech.speak('وعليكم السلام ورحمة الله', {language: 'ar'});
+  };
+
   const onSpeechResultsHandler = (e: any) => {
     const text = e.value[0];
     setSpeechText(text);
@@ -64,15 +69,21 @@ export default function HomeScreen() {
       setHasReplied(true);
       setTimeout(() => {
         setModelNormal();
-      }, 3500);
-    }
-  };
+      }, 5500);
+    };
 
-  const onSpeechErrorHandler = (e: any) => {
-    console.error('Speech Recognition Error:', e);
-    setIsListening(false);
-    // Optionally, display an error message to the user
-  };
+    const quranReference = parseQuranReference(text);
+    if (quranReference) {
+      const {surah, verse} = quranReference;
+      setSurah(surah);
+      setVerseNumber(verse);
+    }
+
+    const onSpeechErrorHandler = (e: any) => {
+      console.error('Speech Recognition Error:', e);
+      setIsListening(false);
+      // Optionally, display an error message to the user
+    };
 
   const startListening = async () => {
     try {
@@ -93,10 +104,6 @@ export default function HomeScreen() {
     }
   };
 
-  const replyGreeting = () => {
-    Speech.speak('وعليكم السلام ورحمة الله', {language: 'ar'});
-  };
-
   return (
     <View style={[styles.container, {backgroundColor: colors.backgroundColor}]}>
       <View style={styles.bot}>
@@ -115,7 +122,7 @@ export default function HomeScreen() {
           style={styles.button}
         >
           <Text style={styles.buttonText}>
-            {isListening ? 'Stop Listening' : 'Start Listening'}
+            {isListening ? 'Stop Test' : 'Start Test'}
           </Text>
         </TouchableOpacity>
         <Text style={styles.recognizedText}>{speechText || '...'}</Text>

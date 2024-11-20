@@ -1,12 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useVideoPlayer, VideoView} from 'expo-video';
+import {AudioModule, useAudioPlayer} from 'expo-audio';
 import Verse from '@/components/Verse';
 import * as Speech from 'expo-speech';
 import Voice from '@react-native-voice/voice';
 import {getThemeColors} from '@/constants/themeConstants';
 import {parseSurahName} from '@/utils/quranUtils';
 import {surahData} from '@/utils/surahData';
+import {getVerseAudio} from '@/services/quran';
 
 export default function HomeScreen() {
   const [surah, setSurah] = useState<number | null>(null);
@@ -14,7 +16,6 @@ export default function HomeScreen() {
   const gender = 'male';
   const colors = getThemeColors(false, gender);
 
-  // Preload both videos
   const normalVideoSource = require('../../assets/videos/male/normal.mov');
   const speakingVideoSource = require('../../assets/videos/male/speaking.mov');
 
@@ -44,8 +45,10 @@ export default function HomeScreen() {
   const [speechText, setSpeechText] = useState('');
   const [testStarted, setTestStarted] = useState(false);
 
-  // Use a ref to track if we've already processed the speech result
   const hasProcessedSpeech = useRef(false);
+
+  let audioPlayer = useAudioPlayer();
+
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStartHandler;
@@ -53,32 +56,36 @@ export default function HomeScreen() {
     Voice.onSpeechResults = onSpeechResultsHandler;
     Voice.onSpeechError = onSpeechErrorHandler;
 
+    AudioModule.setAudioModeAsync({
+      playsInSilentMode: true,
+      allowsRecording: false,
+    });
+
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
+
+      // if (audioPlayer.loop) {
+      //  audioPlayer.current.unloadAsync();
+      // }
     };
   }, []);
 
   const onSpeechStartHandler = (e: any) => {
-    console.log('Speech Start:', e);
-    hasProcessedSpeech.current = false; // Reset the flag when speech starts
+    hasProcessedSpeech.current = false;
   };
 
   const onSpeechEndHandler = (e: any) => {
-    console.log('Speech End:', e);
     setIsListening(false);
   };
 
   const onSpeechErrorHandler = (e: any) => {
-    console.error('Speech Recognition Error:', e);
     setIsListening(false);
   };
 
   const onSpeechResultsHandler = async (e: any) => {
     const text = e.value[0];
     setSpeechText(text);
-    console.log('Speech Results:', text);
 
-    // Prevent multiple executions
     if (hasProcessedSpeech.current) {
       return;
     }
@@ -87,22 +94,23 @@ export default function HomeScreen() {
     if (!testStarted) {
       const surahNumber = parseSurahName(text);
       if (surahNumber) {
-        setSurah(surahNumber);
         await pickRandomVerse(surahNumber);
+        setSurah(surahNumber);
         setTestStarted(true);
 
-        // Model says "اقرأ من قوله تعالى"
         setModelSpeaking();
-        Speech.speak('اقرأ من قوله تعالى', {
+        Speech.speak('اقْرَأْ مِنْ قَوْلِهِ تَعَالَى', {
           language: 'ar',
           onDone: () => {
             setModelNormal();
+            if (surahNumber && verseNumber) {
+              playVerseAudio(surahNumber, verseNumber);
+            }
           },
         });
       } else {
-        // Prompt the user to mention the Surah again
         setModelSpeaking();
-        Speech.speak('من فضلك، اختر سورة لبدء الاختبار', {
+        Speech.speak('مِنْ فَضْلِكَ، اخْتَرْ سُورَةً لِبَدْءِ الِاخْتِبَار', {
           language: 'ar',
           onDone: () => {
             setModelNormal();
@@ -111,7 +119,6 @@ export default function HomeScreen() {
         });
       }
     } else {
-      // Handle user's recitation here
       stopListening();
     }
   };
@@ -125,12 +132,32 @@ export default function HomeScreen() {
     }
   };
 
+  const playVerseAudio = async (surahNumber: number, verseNum: number) => {
+    try {
+      const verseKey = `${surahNumber}:${verseNum}`;
+      const recitationId = 7;
+      const audioUrl = await getVerseAudio(verseKey, recitationId);
+
+      if (audioUrl) {
+        const player = useAudioPlayer({uri: audioUrl});
+        player.play();
+        player.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            player.stop();
+            player.unload();
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    }
+  };
+
   const startListening = async () => {
     try {
       setIsListening(true);
       await Voice.start('ar-EG');
     } catch (error) {
-      console.error('Error starting Voice recognition:', error);
       setIsListening(false);
     }
   };
@@ -140,7 +167,6 @@ export default function HomeScreen() {
       await Voice.stop();
       setIsListening(false);
     } catch (error) {
-      console.error('Error stopping Voice recognition:', error);
     }
   };
 
@@ -149,13 +175,16 @@ export default function HomeScreen() {
     setVerseNumber(null);
     setSpeechText('');
     setTestStarted(false);
-    hasProcessedSpeech.current = false; // Reset the flag when test resets
+    hasProcessedSpeech.current = false;
+    if (audioPlayer.current) {
+      audioPlayer.current.unloadAsync();
+      audioPlayer.current = null;
+    }
   };
 
   return (
     <View style={[styles.container, {backgroundColor: colors.backgroundColor}]}>
       <View style={styles.bot}>
-        {/* Normal Video */}
         <VideoView
           player={normalPlayer}
           style={[
@@ -164,7 +193,6 @@ export default function HomeScreen() {
           ]}
           contentFit="contain"
         />
-        {/* Speaking Video */}
         <VideoView
           player={speakingPlayer}
           style={[

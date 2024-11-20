@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "nebras",
+    "name": "Nebras",
     "slug": "nebras",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -40,7 +40,8 @@
           "microphonePermission": "Allow Nebras to access the microphone",
           "speechRecognitionPermission": "Allow Nebras to securely recognize user speech"
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true

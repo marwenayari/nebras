@@ -17,7 +17,7 @@ export default function TabLayout() {
         tabBarShowLabel: true, // Enable label display
         tabBarStyle: {
           position: "absolute",
-          bottom: 20,
+          bottom: 25,
           marginLeft: 20,
           marginRight: 20,
           display: "flex",
@@ -28,7 +28,7 @@ export default function TabLayout() {
           paddingTop: 5,
           backgroundColor: Colors[colorScheme ?? "light"].background,
           borderRadius: 15,
-          height: 70, // Adjust height to accommodate labels
+          height: 65, // Adjust height to accommodate labels
           shadowColor: Colors[colorScheme ?? "light"].shadow,
           shadowOpacity: 0.1,
           shadowOffset: {

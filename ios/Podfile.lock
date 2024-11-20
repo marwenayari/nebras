@@ -11,6 +11,8 @@ PODS:
     - ExpoModulesCore
   - ExpoAsset (11.0.1):
     - ExpoModulesCore
+  - ExpoAudio (0.2.4):
+    - ExpoModulesCore
   - ExpoBlur (14.0.1):
     - ExpoModulesCore
   - ExpoDevice (7.0.1):
@@ -1823,6 +1825,7 @@ DEPENDENCIES:
   - EXNotifications (from `../node_modules/expo-notifications/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
+  - ExpoAudio (from `../node_modules/expo-audio/ios`)
   - ExpoBlur (from `../node_modules/expo-blur/ios`)
   - ExpoDevice (from `../node_modules/expo-device/ios`)
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
@@ -1927,6 +1930,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo"
   ExpoAsset:
     :path: "../node_modules/expo-asset/ios"
+  ExpoAudio:
+    :path: "../node_modules/expo-audio/ios"
   ExpoBlur:
     :path: "../node_modules/expo-blur/ios"
   ExpoDevice:
@@ -2101,6 +2106,7 @@ SPEC CHECKSUMS:
   EXNotifications: c5b96ad5fffef5515c9cfc7887ae10f8720c70a5
   Expo: 46cbe74ce0d0f4a4d7b726e90693eb8dfcec6de0
   ExpoAsset: 8138f2a9ec55ae1ad7c3871448379f7d97692d15
+  ExpoAudio: e648285f3693e4095e9f8fd51f5df3a31a3f7991
   ExpoBlur: 562b3da84d3cd79016c411671eaf71a404266415
   ExpoDevice: e24dd19a43065182eb246bc0e7f84186862f1e83
   ExpoFileSystem: cc31b7a48031ab565f9eb5c2b61aa08d774a271a

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useVideoPlayer, VideoView} from 'expo-video';
 import Verse from '@/components/Verse';
@@ -11,7 +11,6 @@ import {surahData} from '@/utils/surahData';
 export default function HomeScreen() {
   const [surah, setSurah] = useState<number | null>(null);
   const [verseNumber, setVerseNumber] = useState<number | null>(null);
-  const [hasReplied, setHasReplied] = useState(false);
   const gender = 'male';
   const colors = getThemeColors(false, gender);
 
@@ -45,6 +44,9 @@ export default function HomeScreen() {
   const [speechText, setSpeechText] = useState('');
   const [testStarted, setTestStarted] = useState(false);
 
+  // Use a ref to track if we've already processed the speech result
+  const hasProcessedSpeech = useRef(false);
+
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStartHandler;
     Voice.onSpeechEnd = onSpeechEndHandler;
@@ -58,7 +60,7 @@ export default function HomeScreen() {
 
   const onSpeechStartHandler = (e: any) => {
     console.log('Speech Start:', e);
-    setHasReplied(false);
+    hasProcessedSpeech.current = false; // Reset the flag when speech starts
   };
 
   const onSpeechEndHandler = (e: any) => {
@@ -76,6 +78,12 @@ export default function HomeScreen() {
     setSpeechText(text);
     console.log('Speech Results:', text);
 
+    // Prevent multiple executions
+    if (hasProcessedSpeech.current) {
+      return;
+    }
+    hasProcessedSpeech.current = true;
+
     if (!testStarted) {
       const surahNumber = parseSurahName(text);
       if (surahNumber) {
@@ -85,7 +93,7 @@ export default function HomeScreen() {
 
         // Model says "اقرأ من قوله تعالى"
         setModelSpeaking();
-        Speech.speak('اقْرَأْ مِنْ قَوْلِهِ تَعَالَى', {
+        Speech.speak('اقرأ من قوله تعالى', {
           language: 'ar',
           onDone: () => {
             setModelNormal();
@@ -94,7 +102,7 @@ export default function HomeScreen() {
       } else {
         // Prompt the user to mention the Surah again
         setModelSpeaking();
-        Speech.speak('مِنْ فَضْلِكَ، اخْتَرْ سُورَةً لِبَدْءِ الِاخْتِبَار', {
+        Speech.speak('من فضلك، اختر سورة لبدء الاختبار', {
           language: 'ar',
           onDone: () => {
             setModelNormal();
@@ -141,6 +149,7 @@ export default function HomeScreen() {
     setVerseNumber(null);
     setSpeechText('');
     setTestStarted(false);
+    hasProcessedSpeech.current = false; // Reset the flag when test resets
   };
 
   return (

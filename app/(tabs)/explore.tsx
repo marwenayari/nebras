@@ -1,12 +1,10 @@
-import {Button, Platform, StyleSheet, View} from 'react-native';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import {Button, Platform, StyleSheet} from 'react-native';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
-import {IconSymbol} from '@/components/ui/IconSymbol';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {SchedulableTriggerInputTypes} from "expo-notifications/src/Notifications.types";
 
 Notifications.setNotificationHandler({
@@ -82,10 +80,10 @@ export default function TabTwoScreen() {
           data: {someData: 'test'},
         },
         trigger: {
-          type: SchedulableTriggerInputTypes.DAILY,
-          hour: 8,
-          minute: 0
-        }, // Trigger after 2 seconds
+          type: SchedulableTriggerInputTypes.TIME_INTERVAL,
+          repeats: false,
+          seconds: 10
+        }, // Trigger after 10 seconds
       });
       console.log('Notification scheduled!');
     } catch (error) {
@@ -94,40 +92,23 @@ export default function TabTwoScreen() {
   };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{light: '#D0D0D0', dark: '#353636'}}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <View style={styles.buttonContainer}>
-        <Button title="Trigger Notification" onPress={triggerNotification}/>
-      </View>
-    </ParallaxScrollView>
+
+    <ThemedView style={styles.container}>
+      <ThemedText style={styles.title} type="title">قريبا</ThemedText>
+      <Button title="اشعار بعد ساعة" onPress={triggerNotification}/>
+    </ThemedView>
   );
 }
 
+
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  buttonContainer: {
-    marginTop: 20,
+  container: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
+  title: {
+    lineHeight: 50,
+  }
 });
+

@@ -1,31 +1,30 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {useVideoPlayer, VideoView} from 'expo-video';
-import {AudioModule, useAudioPlayer} from 'expo-audio';
+import {useVideoPlayer, VideoPlayer, VideoView} from 'expo-video';
+import {useAudioPlayer} from 'expo-audio';
 import Verse from '@/components/Verse';
 import * as Speech from 'expo-speech';
 import Voice from '@react-native-voice/voice';
 import {getThemeColors} from '@/constants/themeConstants';
-import {parseSurahName} from '@/utils/quranUtils';
-import {surahData} from '@/utils/surahData';
-import {getVerseAudio} from '@/services/quran';
+import {parseSurahName, pickRandomVerse} from '@/utils/quranUtils';
+import {getVerseAudio} from "@/services/quran";
 
 export default function HomeScreen() {
   const [surah, setSurah] = useState<number | null>(null);
   const [verseNumber, setVerseNumber] = useState<number | null>(null);
   const gender = 'male';
-  const colors = getThemeColors(false, gender);
+  const colors: any = getThemeColors(false, gender);
 
-  const normalVideoSource = require('../../assets/videos/male/normal.mov');
-  const speakingVideoSource = require('../../assets/videos/male/speaking.mov');
+  const normalVideoSource: any = require('../../assets/videos/male/normal.mov');
+  const speakingVideoSource: any = require('../../assets/videos/male/speaking.mov');
 
-  const normalPlayer = useVideoPlayer(normalVideoSource, (player) => {
+  const normalPlayer: VideoPlayer = useVideoPlayer(normalVideoSource, (player) => {
     player.muted = true;
     player.loop = true;
     player.play();
   });
 
-  const speakingPlayer = useVideoPlayer(speakingVideoSource, (player) => {
+  const speakingPlayer: VideoPlayer = useVideoPlayer(speakingVideoSource, (player) => {
     player.muted = true;
     player.loop = true;
     player.play();
@@ -33,22 +32,12 @@ export default function HomeScreen() {
 
   const [isModelSpeaking, setIsModelSpeaking] = useState(false);
 
-  const setModelSpeaking = () => {
-    setIsModelSpeaking(true);
-  };
-
-  const setModelNormal = () => {
-    setIsModelSpeaking(false);
-  };
-
   const [isListening, setIsListening] = useState(false);
   const [speechText, setSpeechText] = useState('');
   const [testStarted, setTestStarted] = useState(false);
 
   const hasProcessedSpeech = useRef(false);
-
-  let audioPlayer = useAudioPlayer();
-
+  const audioPlayer = useAudioPlayer('https://quranaudio.pages.dev/1/1_1.mp3');
 
   useEffect(() => {
     Voice.onSpeechStart = onSpeechStartHandler;
@@ -56,19 +45,17 @@ export default function HomeScreen() {
     Voice.onSpeechResults = onSpeechResultsHandler;
     Voice.onSpeechError = onSpeechErrorHandler;
 
-    AudioModule.setAudioModeAsync({
-      playsInSilentMode: true,
-      allowsRecording: false,
-    });
+    audioPlayer.play();
 
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
-
-      // if (audioPlayer.loop) {
-      //  audioPlayer.current.unloadAsync();
-      // }
     };
   }, []);
+
+  useEffect(() => {
+    speakingPlayer.muted = true;
+    normalPlayer.muted = true;
+  }, [isModelSpeaking]);
 
   const onSpeechStartHandler = (e: any) => {
     hasProcessedSpeech.current = false;
@@ -94,26 +81,27 @@ export default function HomeScreen() {
     if (!testStarted) {
       const surahNumber = parseSurahName(text);
       if (surahNumber) {
-        await pickRandomVerse(surahNumber);
+        const verse: number = await pickRandomVerse(surahNumber);
+        setVerseNumber(verse);
         setSurah(surahNumber);
         setTestStarted(true);
-
-        setModelSpeaking();
+        setIsModelSpeaking(true);
         Speech.speak('اقْرَأْ مِنْ قَوْلِهِ تَعَالَى', {
           language: 'ar',
           onDone: () => {
-            setModelNormal();
-            if (surahNumber && verseNumber) {
-              playVerseAudio(surahNumber, verseNumber);
+            setIsModelSpeaking(false);
+            console.log("Surah number, verseNumber:", surahNumber, verse);
+            if (surahNumber && verse) {
+              playVerseAudio(surahNumber, verse);
             }
           },
         });
       } else {
-        setModelSpeaking();
+        setIsModelSpeaking(true);
         Speech.speak('مِنْ فَضْلِكَ، اخْتَرْ سُورَةً لِبَدْءِ الِاخْتِبَار', {
           language: 'ar',
           onDone: () => {
-            setModelNormal();
+            setIsModelSpeaking(false);
             startListening();
           },
         });
@@ -123,40 +111,27 @@ export default function HomeScreen() {
     }
   };
 
-  const pickRandomVerse = async (surahNumber: number) => {
-    const surahInfo = surahData.find((s) => s.number === surahNumber);
-    if (surahInfo) {
-      const totalVerses = surahInfo.totalVerses;
-      const randomVerseNumber = Math.floor(Math.random() * totalVerses) + 1;
-      setVerseNumber(randomVerseNumber);
-    }
-  };
-
-  const playVerseAudio = async (surahNumber: number, verseNum: number) => {
+  const playVerseAudio: any = async (surahNumber: number, verseNum: number) => {
     try {
-      const verseKey = `${surahNumber}:${verseNum}`;
-      const recitationId = 7;
-      const audioUrl = await getVerseAudio(verseKey, recitationId);
-
-      if (audioUrl) {
-        const player = useAudioPlayer({uri: audioUrl});
-        player.play();
-        player.setOnPlaybackStatusUpdate((status) => {
-          if (status.isLoaded && status.didJustFinish) {
-            player.stop();
-            player.unload();
-          }
-        });
+      const audioUrl = await getVerseAudio(surahNumber, verseNum);
+      if (!audioUrl) {
+        console.error("Failed to fetch the audio URL.");
+        return;
       }
+      console.log("Playing audio:", audioUrl);
+      audioPlayer.replace({uri: audioUrl});
+      audioPlayer.play();
+      audioPlayer.setPlaybackRate(1.5);
     } catch (error) {
       console.error("Error playing audio:", error);
     }
   };
 
+
   const startListening = async () => {
     try {
       setIsListening(true);
-      await Voice.start('ar-EG');
+      await Voice.start('ar-SA');
     } catch (error) {
       setIsListening(false);
     }
@@ -172,14 +147,10 @@ export default function HomeScreen() {
 
   const resetTest = () => {
     setSurah(null);
-    setVerseNumber(null);
+    //setVerseNumber(null);
     setSpeechText('');
     setTestStarted(false);
     hasProcessedSpeech.current = false;
-    if (audioPlayer.current) {
-      audioPlayer.current.unloadAsync();
-      audioPlayer.current = null;
-    }
   };
 
   return (
@@ -192,6 +163,7 @@ export default function HomeScreen() {
             {opacity: isModelSpeaking ? 0 : 1},
           ]}
           contentFit="contain"
+
         />
         <VideoView
           player={speakingPlayer}
@@ -199,6 +171,8 @@ export default function HomeScreen() {
             styles.backgroundVideo,
             {opacity: isModelSpeaking ? 1 : 0},
           ]}
+          nativeControls={false}
+
           contentFit="contain"
         />
         <View style={styles.verse}>

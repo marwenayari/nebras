@@ -26,23 +26,21 @@ export async function getSurahInfo(surah: number): Promise<any> {
   }
 }
 
-export async function getVerseAudio(verseKey: string, recitationId: number): Promise<string | null> {
+export async function getVerseAudio(surahNumber: number, verseNum: number): Promise<string | null> {
   try {
-    const response = await fetch(
-      `https://api.quran.com/api/v4/verses/by_key/${verseKey}?recitation=${recitationId}&fields=audio`
-    );
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    const audioUrl = data.verse.audio.url;
+    // Ensure surahNumber and verseNum are properly formatted
+    const formattedSurah = surahNumber.toString().padStart(3, '0'); // Surah as 3 digits
+    const formattedVerse = verseNum.toString().padStart(3, '0');   // Verse as 3 digits
+
+    // Construct the URL
+    const audioUrl = `https://mirrors.quranicaudio.com/everyayah/Abu_Bakr_Ash-Shaatree_128kbps/${formattedSurah}${formattedVerse}.mp3`;
+
     return audioUrl;
   } catch (error) {
-    console.error('There was a problem fetching the verse audio:', error);
+    console.error('There was a problem constructing the verse audio URL:', error);
     return null;
   }
 }
-
 
 export async function getVerse(surah: number, verse: number): Promise<any> {
   try {

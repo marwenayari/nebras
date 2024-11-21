@@ -86,23 +86,35 @@ export default function HomeScreen() {
         setSurah(surahNumber);
         setTestStarted(true);
         setIsModelSpeaking(true);
+
+        // Stop listening before playing the instruction audio
+        stopListening();
+
         Speech.speak('اقْرَأْ مِنْ قَوْلِهِ تَعَالَى', {
           language: 'ar',
-          onDone: () => {
+          onDone: async () => {
             setIsModelSpeaking(false);
             console.log("Surah number, verseNumber:", surahNumber, verse);
+
             if (surahNumber && verse) {
-              playVerseAudio(surahNumber, verse);
+              await playVerseAudio(surahNumber, verse);
+
+              // Start listening again after the verse audio finishes
+              startListening();
             }
           },
         });
       } else {
         setIsModelSpeaking(true);
+
+        // Stop listening before playing the retry audio
+        stopListening();
+
         Speech.speak('مِنْ فَضْلِكَ، اخْتَرْ سُورَةً لِبَدْءِ الِاخْتِبَار', {
           language: 'ar',
           onDone: () => {
             setIsModelSpeaking(false);
-            startListening();
+            startListening(); // Restart listening after the retry audio
           },
         });
       }
@@ -111,17 +123,35 @@ export default function HomeScreen() {
     }
   };
 
-  const playVerseAudio: any = async (surahNumber: number, verseNum: number) => {
+
+  const playVerseAudio = async (surahNumber: number, verseNum: number) => {
     try {
       const audioUrl = await getVerseAudio(surahNumber, verseNum);
       if (!audioUrl) {
         console.error("Failed to fetch the audio URL.");
         return;
       }
+
       console.log("Playing audio:", audioUrl);
       audioPlayer.replace({uri: audioUrl});
       audioPlayer.play();
       audioPlayer.setPlaybackRate(1.5);
+
+      // Gradually decrease the volume after 3 seconds
+      setTimeout(() => {
+        let volume = 1.0; // Start at full volume
+        const interval = setInterval(() => {
+          volume -= 0.1; // Decrease volume by 0.1 every 300ms
+          if (volume <= 0) {
+            volume = 0; // Ensure volume doesn't go below 0
+            audioPlayer.volume = volume;
+            audioPlayer.remove() // Stop the audio when the volume is 0
+            clearInterval(interval); // Clear the interval
+          } else {
+            audioPlayer.volume = volume;
+          }
+        }, 400); // Adjust this value to change the speed of the fade-out
+      }, 4000); // Wait for 3 seconds before starting to lower the volume
     } catch (error) {
       console.error("Error playing audio:", error);
     }

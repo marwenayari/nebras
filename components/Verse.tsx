@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {getVerse} from '@/services/quran';
+import {ThemedText} from "@/components/ThemedText";
 
 interface VerseProps {
   surah: number;
@@ -53,7 +54,7 @@ const Verse: React.FC<VerseProps> = ({surah, verseNumber}) => {
 
   return (
     <View>
-      <Text style={styles.verse}>{displayText}</Text>
+      <ThemedText style={styles.verse}>{displayText}</ThemedText>
     </View>
   );
 };
@@ -66,6 +67,7 @@ const styles = StyleSheet.create({
     marginBottom: -15,
     textAlign: 'center',
     color: '#fff',
+    lineHeight: 35,
   },
   loaderContainer: {
     justifyContent: 'center',

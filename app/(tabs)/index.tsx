@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useVideoPlayer, VideoPlayer, VideoView} from 'expo-video';
 import {useAudioPlayer} from 'expo-audio';
 import Verse from '@/components/Verse';
@@ -9,6 +9,7 @@ import {getThemeColors} from '@/constants/themeConstants';
 import {parseSurahName, pickRandomVerse} from '@/utils/quranUtils';
 import {getVerseAudio} from "@/services/quran";
 import {FontAwesome5} from "@expo/vector-icons";
+import {ThemedText} from "@/components/ThemedText";
 
 export default function HomeScreen() {
   const [surah, setSurah] = useState<number | null>(null);
@@ -83,8 +84,7 @@ export default function HomeScreen() {
       const surahNumber = parseSurahName(text);
       if (surahNumber) {
         const verse: number = await pickRandomVerse(surahNumber);
-        setVerseNumber(verse);
-        setSurah(surahNumber);
+
         setTestStarted(true);
         setIsModelSpeaking(true);
 
@@ -98,6 +98,8 @@ export default function HomeScreen() {
             console.log("Surah number, verseNumber:", surahNumber, verse);
 
             if (surahNumber && verse) {
+              setVerseNumber(verse);
+              setSurah(surahNumber);
               await playVerseAudio(surahNumber, verse);
 
               // Start listening again after the verse audio finishes
@@ -210,16 +212,16 @@ export default function HomeScreen() {
           {surah && verseNumber ? (
             <Verse surah={surah} verseNumber={verseNumber}/>
           ) : (
-            <Text style={styles.instructionText}>
+            <ThemedText style={styles.instructionText}>
               {isListening
                 ? 'الرجاء ذكر اسم السورة'
                 : 'اضغط على "اختبار حفظ"واختر سورة'}
-            </Text>
+            </ThemedText>
           )}
         </View>
       </View>
       <View style={styles.content}>
-        <Text style={styles.recognizedText}>{speechText || ''}</Text>
+        <ThemedText style={styles.recognizedText}>{speechText || ''}</ThemedText>
         <View style={styles.buttons}>
           <TouchableOpacity
             onPress={
@@ -240,9 +242,9 @@ export default function HomeScreen() {
               color="#fff"
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>
+            <ThemedText style={styles.buttonText}>
               {isListening || testStarted ? 'إيقاف' : 'اختبار حفظ'}
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -257,7 +259,7 @@ export default function HomeScreen() {
               color="#fff"
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>مراجعة حفظ</Text>
+            <ThemedText style={styles.buttonText}>مراجعة حفظ</ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -272,7 +274,7 @@ export default function HomeScreen() {
               color="#fff"
               style={styles.icon}
             />
-            <Text style={styles.buttonText}>سؤال عام</Text>
+            <ThemedText style={styles.buttonText}>سؤال عام</ThemedText>
           </TouchableOpacity>
         </View>
       </View>
@@ -308,7 +310,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     textAlign: 'center',
     color: '#fff',
-    paddingHorizontal: 20,
+    lineHeight: 35,
   },
   content: {
     flex: 1,

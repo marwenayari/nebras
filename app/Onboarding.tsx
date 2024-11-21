@@ -14,7 +14,7 @@ import Dot from "@/components/Dot";
 import {ThemedText} from "@/components/ThemedText";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function App() {
+export default function Onboarding({onComplete}: { onComplete: () => void }) {
   const translateX = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler({
@@ -32,15 +32,15 @@ export default function App() {
   const onIconPress = useCallback(async () => {
     if (activeIndex.value === PAGES.length - 1) {
       try {
-        await AsyncStorage.setItem('onboarding', 'true'); // Save onboarding state
+        await AsyncStorage.setItem('onboarding', 'true');
+        onComplete(); // Notify layout to update the view
       } catch (error) {
         console.error('Error saving onboarding state:', error);
       }
-      // Navigate to main app or exit onboarding
     } else {
       scrollRef.current?.scrollTo({x: PAGE_WIDTH * (activeIndex.value + 1)});
     }
-  }, [activeIndex, scrollRef]);
+  }, [activeIndex, scrollRef, onComplete]);
 
   return (
     <View style={styles.container}>

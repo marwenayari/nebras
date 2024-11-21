@@ -26,6 +26,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    //AsyncStorage.removeItem('onboarding');
     const checkOnboarding = async () => {
       try {
         const onboardingCompleted = await AsyncStorage.getItem('onboarding');
@@ -33,7 +34,6 @@ export default function RootLayout() {
       } catch (error) {
         console.error('Error reading onboarding state:', error);
       }
-      setLoading(false);
     };
 
     checkOnboarding();
@@ -56,8 +56,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
     >
       {showOnboarding ? (
-        <Onboarding/>
-      ) : (
+        <Onboarding onComplete={() => setShowOnboarding(false)}/>) : (
         <Stack>
           <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
           <Stack.Screen name="+not-found"/>

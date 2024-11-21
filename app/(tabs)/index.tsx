@@ -8,6 +8,7 @@ import Voice from '@react-native-voice/voice';
 import {getThemeColors} from '@/constants/themeConstants';
 import {parseSurahName, pickRandomVerse} from '@/utils/quranUtils';
 import {getVerseAudio} from "@/services/quran";
+import {FontAwesome5} from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const [surah, setSurah] = useState<number | null>(null);
@@ -212,30 +213,68 @@ export default function HomeScreen() {
             <Text style={styles.instructionText}>
               {isListening
                 ? 'الرجاء ذكر اسم السورة'
-                : 'اضغط على "بدء الاختبار" لاختيار السورة'}
+                : 'اضغط على "اختبار حفظ"واختر سورة'}
             </Text>
           )}
         </View>
       </View>
       <View style={styles.content}>
-        <TouchableOpacity
-          onPress={
-            isListening
-              ? stopListening
-              : testStarted
-                ? () => {
-                  resetTest();
-                  startListening();
-                }
-                : startListening
-          }
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>
-            {isListening ? 'إيقاف' : testStarted ? 'إعادة الاختبار' : 'بدء الاختبار'}
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.recognizedText}>{speechText || '...'}</Text>
+        <Text style={styles.recognizedText}>{speechText || ''}</Text>
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            onPress={
+              isListening
+                ? stopListening
+                : testStarted
+                  ? () => {
+                    resetTest();
+                    startListening();
+                  }
+                  : startListening
+            }
+            style={[styles.button]}
+          >
+            <FontAwesome5
+              name={isListening || testStarted ? 'stop' : 'eye-slash'}
+              size={24}
+              color="#fff"
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>
+              {isListening || testStarted ? 'إيقاف' : 'اختبار حفظ'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              console.log('مراجعة حفظ pressed');
+            }}
+            style={[styles.button]}
+          >
+            <FontAwesome5
+              name="microphone"
+              size={24}
+              color="#fff"
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>مراجعة حفظ</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              console.log('سؤال عام pressed');
+            }}
+            style={[styles.button]}
+          >
+            <FontAwesome5
+              name="question-circle"
+              size={24}
+              color="#fff"
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>سؤال عام</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -274,6 +313,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#fff',
     width: '100%',
     borderTopLeftRadius: 50,
@@ -285,17 +325,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingTop: 30,
   },
+  buttons: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
   button: {
-    backgroundColor: '#1E90FF',
-    padding: 15,
-    borderRadius: 50,
-    marginBottom: 20,
-    width: '80%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#a1d4d1',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: '60%',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     textAlign: 'center',
+    marginLeft: 10,
+  },
+  icon: {
+    marginRight: 10,
   },
   recognizedText: {
     fontSize: 20,

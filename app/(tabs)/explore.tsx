@@ -75,15 +75,15 @@ export default function TabTwoScreen() {
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: 'نبراس',
-          body: 'موعد المراجعة اليومية',
+          title: 'نبراس | المراجعة اليومية',
+          body: '﴿وَذَكِّرْ فَإِنَّ الذِّكْرَىٰ تَنفَعُ الْمُؤْمِنِينَ﴾',
           data: {someData: 'test'},
         },
         trigger: {
           type: SchedulableTriggerInputTypes.TIME_INTERVAL,
           repeats: false,
-          seconds: 10
-        }, // Trigger after 10 seconds
+          seconds: 3
+        }, // Trigger after 3 seconds
       });
       console.log('Notification scheduled!');
     } catch (error) {

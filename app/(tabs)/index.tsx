@@ -10,39 +10,7 @@ import {parseSurahName, pickRandomVerse} from '@/utils/quranUtils';
 import {getVerseAudio} from "@/services/quran";
 import {FontAwesome5} from "@expo/vector-icons";
 import {ThemedText} from "@/components/ThemedText";
-
-function FloatingMenu({testStarted, onPress}) {
-  const iconSize = 20;
-  const active: number = 1;
-
-  return (
-    <View style={styles.buttonsContainer}>
-      <TouchableOpacity
-        style={[styles.menuItem]}
-        onPress={() => onPress()}
-      >
-        <FontAwesome5 name={testStarted ? 'stop' : 'eye-slash'} style={active == 0 && styles.active}
-                      size={iconSize}
-                      color="#666"/>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.menuItem]}
-        onPress={() => onPress()}
-      >
-        <FontAwesome5 name="microphone" style={active == 1 && styles.active} size={iconSize} color="#666"/>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.menuItem]}
-        onPress={() => onPress()}
-      >
-        <FontAwesome5 name="question-circle" style={active == 2 && styles.active} size={iconSize} color="#666"/>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
+import FloatingHomeMenu from "@/components/FloatingHomeMenu";
 
 export default function HomeScreen() {
   const [surah, setSurah] = useState<number | null>(null);
@@ -126,17 +94,17 @@ export default function HomeScreen() {
 
         Speech.speak('اقْرَأْ مِنْ قَوْلِهِ تَعَالَى', {
           language: 'ar',
-          onDone: async () => {
+          onDone: () => {
             setIsModelSpeaking(false);
             console.log("Surah number, verseNumber:", surahNumber, verse);
 
             if (surahNumber && verse) {
               setVerseNumber(verse);
               setSurah(surahNumber);
-              await playVerseAudio(surahNumber, verse);
-
-              // Start listening again after the verse audio finishes
-              startListening();
+              playVerseAudio(surahNumber, verse).then(() => {
+                // Start listening again after the verse audio finishes
+                startListening();
+              });
             }
           },
         });
@@ -302,7 +270,7 @@ export default function HomeScreen() {
             </ThemedText>
           </TouchableOpacity>
         </View>
-        <FloatingMenu testStarted={testStarted} onPress={handleMenuPress}/>
+        <FloatingHomeMenu testStarted={testStarted} onPress={handleMenuPress}/>
 
       </View>
 

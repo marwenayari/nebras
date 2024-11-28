@@ -211,7 +211,7 @@ export default function Example() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              // handle onPress
+              router.push('/support');
             }}
             style={styles.row}>
             <View style={[styles.rowIcon, {backgroundColor: '#32c759'}]}>
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 9999,
-    backgroundColor: '#007bff',
+    backgroundColor: '#a1d4d1',
   },
   profileName: {
     marginTop: 20,
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     textAlign: 'right',
     paddingVertical: 12,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: '#9e9e9e',
     textTransform: 'uppercase',

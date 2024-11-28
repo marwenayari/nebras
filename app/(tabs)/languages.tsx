@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, StyleSheet, TouchableOpacity} from "react-native";
+import {StyleSheet, TouchableOpacity} from "react-native";
 import Animated, {useAnimatedStyle, useSharedValue, withSpring} from "react-native-reanimated";
 import {ThemedText} from "@/components/ThemedText";
 import {ThemedView} from "@/components/ThemedView";
@@ -12,33 +12,33 @@ export default function Support() {
   const translateX = useSharedValue<number>(-100);
 
   const translate = useAnimatedStyle(() => ({
-    transform: [{translateX: withSpring(translateX.value)}],
+    transform: [{translateX: withSpring(translateX.value * 2)}],
   }));
 
 
   useFocusEffect(
     React.useCallback(() => {
-      translateX.value = -200;
+      translateX.value = -100;
       setTimeout(() => {
-        translateX.value = 0;
+        translateX.value += 100;
       }, 50);
     }, [])
   );
 
   return (
     <ThemedView style={styles.container}>
-      {/* Back button in the top right */}
       <TouchableOpacity
-        onPress={() => router.navigate("/settings")}
+        onPress={() => {
+          translateX.value = -100;
+          router.navigate("/settings");
+        }}
         style={styles.backButton}
       >
         <FontAwesome5 name="chevron-right" color="#333" size={25}/>
       </TouchableOpacity>
-
-      {/* Animated content */}
       <Animated.View style={[styles.animatedContainer, translate]}>
+        <FontAwesome5 name="globe" color="orange" size={25}/>
         <ThemedText type="subtitle">صفحة اللغة قريبا</ThemedText>
-        <Button title="العربية" onPress={() => alert("اللغة العربية!")}/>
       </Animated.View>
     </ThemedView>
   );
@@ -52,10 +52,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 100,
+    top: 80,
     right: 20,
   },
   animatedContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     marginVertical: 10,
   },
 });

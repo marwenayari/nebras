@@ -13,9 +13,9 @@ export default function FloatingMenu({}) {
 
   const animationValues = [useSharedValue(0), useSharedValue(0), useSharedValue(0)];
   const menuItems = [
-    {icon: "user-circle", screen: "/settings"},
     {icon: "bookmark", screen: "/support"},
     {icon: "book-reader", screen: "/"},
+    {icon: "user-circle", screen: "/settings"},
   ];
 
   const toggleMenu = () => {

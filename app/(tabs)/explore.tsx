@@ -33,7 +33,7 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      alert('Permission not granted for push notifications!');
+      //alert('Permission not granted for push notifications!');
       return;
     }
     const projectId =
@@ -42,7 +42,7 @@ async function registerForPushNotificationsAsync() {
     console.log(token);
     return token;
   } else {
-    alert('Must use physical device for push notifications');
+    //alert('Must use physical device for push notifications');
   }
 }
 
@@ -94,6 +94,7 @@ export default function TabTwoScreen() {
   return (
 
     <ThemedView style={styles.container}>
+      <ThemedText style={styles.title} type="title">اعدادات المستخدم</ThemedText>
       <ThemedText style={styles.title} type="title">قريبا</ThemedText>
       <Button title="اشعار بعد ساعة" onPress={triggerNotification}/>
     </ThemedView>

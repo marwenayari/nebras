@@ -18,8 +18,8 @@ const Verse: React.FC<VerseProps> = ({surah, verseNumber}) => {
       setLoading(true);
       const response = await getVerse(surah, verseNumber);
 
-      if (response && response.verses[0]) {
-        const fullVerse = response.verses[0].text_uthmani;
+      if (response && response.arabic1) {
+        const fullVerse = response.arabic1;
         setVerse(fullVerse);
         processVerse(fullVerse);
       } else {

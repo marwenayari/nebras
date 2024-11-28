@@ -45,7 +45,7 @@ export async function getVerseAudio(surahNumber: number, verseNum: number): Prom
 export async function getVerse(surah: number, verse: number): Promise<any> {
   try {
     const response = await fetch(
-      `https://api.quran.com/api/v4/quran/verses/uthmani?surah=${surah}&verse_key=${surah}:${verse}`,
+      `https://quranapi.pages.dev/api/${surah}/${verse}.json`
     );
     if (!response.ok) {
       throw new Error('Network response was not ok');

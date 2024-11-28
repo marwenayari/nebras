@@ -11,6 +11,39 @@ import {getVerseAudio} from "@/services/quran";
 import {FontAwesome5} from "@expo/vector-icons";
 import {ThemedText} from "@/components/ThemedText";
 
+function FloatingMenu({testStarted, onPress}) {
+  const iconSize = 20;
+  const active: number = 1;
+
+  return (
+    <View style={styles.buttonsContainer}>
+      <TouchableOpacity
+        style={[styles.menuItem]}
+        onPress={() => onPress()}
+      >
+        <FontAwesome5 name={testStarted ? 'stop' : 'eye-slash'} style={active == 0 && styles.active}
+                      size={iconSize}
+                      color="#666"/>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.menuItem]}
+        onPress={() => onPress()}
+      >
+        <FontAwesome5 name="microphone" style={active == 1 && styles.active} size={iconSize} color="#666"/>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.menuItem]}
+        onPress={() => onPress()}
+      >
+        <FontAwesome5 name="question-circle" style={active == 2 && styles.active} size={iconSize} color="#666"/>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+
 export default function HomeScreen() {
   const [surah, setSurah] = useState<number | null>(null);
   const [verseNumber, setVerseNumber] = useState<number | null>(null);
@@ -186,6 +219,28 @@ export default function HomeScreen() {
     hasProcessedSpeech.current = false;
   };
 
+
+  const handleMenuPress = () => {
+    console.log("handleMenuPress")
+    console.log("handleMenuPress testStarted", testStarted)
+    console.log("handleMenuPress isListening", isListening)
+
+    if (testStarted) {
+      if (isListening) {
+        stopListening();
+      } else {
+        resetTest();
+        startListening();
+      }
+    } else {
+      if (isListening) {
+        stopListening()
+      } else {
+        startListening()
+      }
+    }
+  };
+
   return (
     <View style={[styles.container, {backgroundColor: colors.backgroundColor}]}>
       <View style={styles.bot}>
@@ -214,8 +269,8 @@ export default function HomeScreen() {
           ) : (
             <ThemedText style={styles.instructionText}>
               {isListening
-                ? 'الرجاء ذكر اسم السورة'
-                : 'اضغط على "اختبار حفظ"واختر سورة'}
+                ? ''
+                : ''}
             </ThemedText>
           )}
         </View>
@@ -239,45 +294,18 @@ export default function HomeScreen() {
             <FontAwesome5
               name={isListening || testStarted ? 'stop' : 'eye-slash'}
               size={24}
-              color="#fff"
+              color="#555"
               style={styles.icon}
             />
             <ThemedText style={styles.buttonText}>
               {isListening || testStarted ? 'إيقاف' : 'اختبار حفظ'}
             </ThemedText>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {
-              console.log('مراجعة حفظ pressed');
-            }}
-            style={[styles.button]}
-          >
-            <FontAwesome5
-              name="microphone"
-              size={24}
-              color="#fff"
-              style={styles.icon}
-            />
-            <ThemedText style={styles.buttonText}>مراجعة حفظ</ThemedText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {
-              console.log('سؤال عام pressed');
-            }}
-            style={[styles.button]}
-          >
-            <FontAwesome5
-              name="question-circle"
-              size={24}
-              color="#fff"
-              style={styles.icon}
-            />
-            <ThemedText style={styles.buttonText}>سؤال عام</ThemedText>
-          </TouchableOpacity>
         </View>
+        <FloatingMenu testStarted={testStarted} onPress={handleMenuPress}/>
+
       </View>
+
     </View>
   );
 }
@@ -337,25 +365,48 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#a1d4d1',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    backgroundColor: '#f1f1f1',
+    paddingVertical: 10,
     borderRadius: 5,
-    marginBottom: 10,
-    width: '60%',
+    width: '50%',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   buttonText: {
-    color: '#fff',
+    color: '#555',
     fontSize: 18,
     textAlign: 'center',
     marginLeft: 10,
   },
   icon: {
     marginRight: 10,
+  },
+  buttonsContainer: {
+    position: "absolute",
+    bottom: 20,
+    flexDirection: "row",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+  menuItem: {
+    //backgroundColor: "#fff",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#333",
+    //shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
+    shadowOffset: {width: 0, height: 3},
+    shadowRadius: 5,
+  },
+  active: {
+    color: '#a1d4d1'
   },
   recognizedText: {
     fontSize: 20,
